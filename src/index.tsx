@@ -38,7 +38,7 @@ interface CoursePartFour extends CoursePartOneThreeFourBase {
 
 type CoursePart = CoursePartOne | CoursePartTwo | CoursePartThree | CoursePartFour;
 
-const Part: React.FC<{ courseParts: CoursePart }> = ({ courseParts }) => {
+const Part: React.FC<{ courseParts: CoursePart[] }> = ({ courseParts }) => {
   const assertNever = (value: never): never => {
     throw new Error(
       `Unhandled discriminated union member: ${JSON.stringify(value)}`
@@ -62,28 +62,30 @@ const Part: React.FC<{ courseParts: CoursePart }> = ({ courseParts }) => {
 
   return (
     <p>
-      {courseParts.name} {courseParts.exerciseCount}
+      {courseParts.filter(part => part.name)} {courseParts.filter(part => part.exerciseCount)}
     </p>
   );
 };
 
-const Content: React.FC<{ courseParts: CoursePart }> = ({ courseParts }) => {
+const Content: React.FC<{ courseParts: CoursePart[] }> = ({ courseParts }) => {
   return (
-    courseParts.map(
-      <Part />
-    )
+    <div>
+      {courseParts.map((part) => 
+        <Part key={part.name} courseParts={courseParts} />
+      )}
+    </div>
   );
 };
 
-interface TotalProps {
+/*interface TotalProps {
   courseParts: { name: string; exerciseCount: number }[];
-}
+}*/
 
-const Total: React.FC<TotalProps> = (props) => {
+const Total: React.FC<{ courseParts: CoursePart[] }> = ({ courseParts}) => {
   return (
     <p>
         Number of exercises{" "}
-        {props.courseParts.reduce((carry, part) => carry + part.exerciseCount, 0)}
+        {courseParts.reduce((carry, part) => carry + part.exerciseCount, 0)}
     </p>
   );
 };
@@ -117,7 +119,6 @@ const App = () => {
   return (
     <div>
       <Header courseName={courseName} />
-      <Part courseParts={courseParts} />
       <Content courseParts={courseParts} />
       <Total courseParts={courseParts} />
     </div>
