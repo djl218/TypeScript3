@@ -9,33 +9,74 @@ const Header: React.FC<HeaderProps> = (props) => {
   return <h1>{props.courseName}</h1>;
 };
 
-interface ContentProps {
-  partName0: string;
-  partName1: string;
-  partName2: string;
-  partNumber0: number;
-  partNumber1: number;
-  partNumber2: number;
+interface CoursePartBase {
+  name: string;
+  exerciseCount: number;
 }
 
-const Content: React.FC<ContentProps> = (props) => {
+interface CoursePartOneThreeFourBase extends CoursePartBase {
+  description: string;
+}
+
+interface CoursePartOne extends CoursePartOneThreeFourBase {
+  name: "Fundamentals";
+}
+
+interface CoursePartTwo extends CoursePartBase {
+  name: "Using props to pass data";
+  groupProjectCount: number;
+}
+
+interface CoursePartThree extends CoursePartOneThreeFourBase {
+  name: "Deeper type usage";
+  exerciseSubmissionLink: string;
+}
+
+interface CoursePartFour extends CoursePartOneThreeFourBase {
+  name: "Creating buttons that click";
+}
+
+type CoursePart = CoursePartOne | CoursePartTwo | CoursePartThree | CoursePartFour;
+
+const Part: React.FC<{ courseParts: CoursePart }> = ({ courseParts }) => {
+  const assertNever = (value: never): never => {
+    throw new Error(
+      `Unhandled discriminated union member: ${JSON.stringify(value)}`
+    )
+  };
+  
+  courseParts.forEach(part => {
+    switch (part.name) {
+      case "Fundamentals":
+        break;
+      case "Using props to pass data":
+        break;
+      case "Deeper type usage":
+        break;
+      case "Creating buttons that click":
+        break;
+      default:
+        return assertNever(part);
+    }
+  });
+
   return (
-    <div>
-      <p>
-        {props.partName0} {props.partNumber0}
-      </p>
-      <p>
-        {props.partName1} {props.partNumber1}
-      </p>
-      <p>
-        {props.partName2} {props.partNumber2}
-      </p>
-    </div>
-  )
+    <p>
+      {courseParts.name} {courseParts.exerciseCount}
+    </p>
+  );
+};
+
+const Content: React.FC<{ courseParts: CoursePart }> = ({ courseParts }) => {
+  return (
+    courseParts.map(
+      <Part />
+    )
+  );
 };
 
 interface TotalProps {
-  courseParts: { name: string, exerciseCount: number }[];
+  courseParts: { name: string; exerciseCount: number }[];
 }
 
 const Total: React.FC<TotalProps> = (props) => {
@@ -44,7 +85,7 @@ const Total: React.FC<TotalProps> = (props) => {
         Number of exercises{" "}
         {props.courseParts.reduce((carry, part) => carry + part.exerciseCount, 0)}
     </p>
-  )
+  );
 };
 
 const App = () => {
@@ -52,29 +93,32 @@ const App = () => {
   const courseParts = [
     {
       name: "Fundamentals",
-      exerciseCount: 10
+      exerciseCount: 10,
+      description: "This is an awesome course part"
     },
     {
       name: "Using props to pass data",
-      exerciseCount: 7
+      exerciseCount: 7,
+      groupProjectCount: 3
     },
     {
       name: "Deeper type usage",
-      exerciseCount: 14
+      exerciseCount: 14,
+      description: "Confusing description",
+      exerciseSubmissionLink: "https://fake-exercise-submit.made-up-url.dev"
+    },
+    {
+      name: "Creating buttons that click",
+      exerciseCount: 12,
+      description: "Great section to hone your button making skills"
     }
   ];
 
   return (
     <div>
       <Header courseName={courseName} />
-      <Content
-        partName0={courseParts[0].name}
-        partName1={courseParts[1].name}
-        partName2={courseParts[2].name}
-        partNumber0={courseParts[0].exerciseCount}
-        partNumber1={courseParts[1].exerciseCount}
-        partNumber2={courseParts[2].exerciseCount}
-      />
+      <Part courseParts={courseParts} />
+      <Content courseParts={courseParts} />
       <Total courseParts={courseParts} />
     </div>
   );
