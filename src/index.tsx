@@ -38,31 +38,29 @@ interface CoursePartFour extends CoursePartOneThreeFourBase {
 
 type CoursePart = CoursePartOne | CoursePartTwo | CoursePartThree | CoursePartFour;
 
-const Part: React.FC<{ courseParts: CoursePart[] }> = ({ courseParts }) => {
+const Part: React.FC<{ coursePart: CoursePart }> = ({ coursePart }) => {
   const assertNever = (value: never): never => {
     throw new Error(
       `Unhandled discriminated union member: ${JSON.stringify(value)}`
     )
   };
   
-  courseParts.forEach(part => {
-    switch (part.name) {
-      case "Fundamentals":
-        break;
-      case "Using props to pass data":
-        break;
-      case "Deeper type usage":
-        break;
-      case "Creating buttons that click":
-        break;
-      default:
-        return assertNever(part);
-    }
-  });
+  switch (coursePart.name) {
+    case "Fundamentals":
+      break;
+    case "Using props to pass data":
+      break;
+    case "Deeper type usage":
+      break;
+    case "Creating buttons that click":
+      break;
+    default:
+      return assertNever(coursePart);
+  }
 
   return (
-    <p>
-      {courseParts.filter(part => part.name)} {courseParts.filter(part => part.exerciseCount)}
+    <p key={coursePart.name}>
+      {coursePart.name} {coursePart.exerciseCount}
     </p>
   );
 };
@@ -70,18 +68,14 @@ const Part: React.FC<{ courseParts: CoursePart[] }> = ({ courseParts }) => {
 const Content: React.FC<{ courseParts: CoursePart[] }> = ({ courseParts }) => {
   return (
     <div>
-      {courseParts.map((part) => 
-        <Part key={part.name} courseParts={courseParts} />
+      {courseParts.map(part => 
+        <Part key={part.name} coursePart={part} />
       )}
     </div>
   );
 };
 
-/*interface TotalProps {
-  courseParts: { name: string; exerciseCount: number }[];
-}*/
-
-const Total: React.FC<{ courseParts: CoursePart[] }> = ({ courseParts}) => {
+const Total: React.FC<{ courseParts: CoursePart[] }> = ({ courseParts }) => {
   return (
     <p>
         Number of exercises{" "}
@@ -92,7 +86,7 @@ const Total: React.FC<{ courseParts: CoursePart[] }> = ({ courseParts}) => {
 
 const App = () => {
   const courseName = "Half Stack application development";
-  const courseParts = [
+  const courseParts: CoursePart[] = [
     {
       name: "Fundamentals",
       exerciseCount: 10,
